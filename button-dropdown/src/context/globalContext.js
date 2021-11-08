@@ -15,16 +15,45 @@ const DropDownContextProvider = (props) => {
     const [searchWord, setSearchWord] = useState('')
 
     useEffect(() => {
-        // Loading Data from local Storage
-        const contactsData = JSON.parse(sessionStorage.getItem('contactsList'));
-        if (contactsData) {
+        // save to storage
+        if (typeof Storage !== 'undefined') {
+            // localStorage supported.
+            localStorage.setItem('contactsList', JSON.stringify(contactsList));
+        } else {
+            // Using cookies here :(
+            const contactsData = contactsList;
+            contactsData.forEach((contact) => {
+            document.cookie = `${contact.id}=${contact.name}; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+            });
+        }
+    }, [contactsList]);
+
+    useEffect(() => {
+        // Load from storage
+        if (typeof Storage !== 'undefined') {
+          // localStorage supported.
+          const contactsData = JSON.parse(localStorage.getItem('contactsList'));
+          if (contactsData) {
             setContactsList(contactsData);
-        } 
+          }
+        } else {
+          // Using cookies here :(
+          let contactsData = document.cookie;
+          if (contactsData !== '') {
+            contactsData = contactsData.split('; ');
+            const decodedContacts = [];
+            contactsData.forEach((contact) => {
+              const splitContact = contact.split('=');
+              decodedContacts.push({
+                id: splitContact[0],
+                name: splitContact[1],
+              });
+            });
+            setContactsList(decodedContacts);
+          }
+        }
     }, []);
-
-    // save Data to local Storage
-    localStorage.setItem('contactsList', JSON.stringify(contactsList));
-
+    
     const contacts = 
         [
             { 'id': 1, 'name': 'Louie Popp', 'icon': faUser },
