@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle, faShopify, faInstagram, faUber, faAlgolia  } from '@fortawesome/free-brands-svg-icons';
 
@@ -13,6 +13,17 @@ const DropDownContextProvider = (props) => {
     })
     const [contactsList, setContactsList] = useState([])
     const [searchWord, setSearchWord] = useState('')
+
+    useEffect(() => {
+        // Loading Data from local Storage
+        const contactsData = JSON.parse(sessionStorage.getItem('contactsList'));
+        if (contactsData) {
+            setContactsList(contactsData);
+        } 
+    }, []);
+
+    // save Data to local Storage
+    localStorage.setItem('contactsList', JSON.stringify(contactsList));
 
     const contacts = 
         [
