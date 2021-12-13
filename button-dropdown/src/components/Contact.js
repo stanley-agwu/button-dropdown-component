@@ -8,11 +8,13 @@ export const StyledContact = styled.div`
     display: flex;
     box-sizing: border-box;
     padding: 3px;
-    color: ${({theme, selectedID, contact}) => selectedID === contact.id ? theme.white : theme.textGrey };
+    color: ${({theme, selectedID, contact, isSelectedContact}) => selectedID === contact.id
+        || isSelectedContact === true ? theme.white : theme.textGrey };
     align-items: center;
     width: 320px;
     height: 33px;
-    background: ${({theme, selectedID, contact}) => selectedID === contact.id ? theme.green : theme.white};
+    background: ${({theme, selectedID, contact, isSelectedContact}) => isSelectedContact === true ? theme.black :
+            selectedID === contact.id ? theme.green : theme.white};
     border-radius: 5px;
     cursor: pointer;
 
@@ -44,15 +46,18 @@ export const StyledContact = styled.div`
         margin-right: 5px;
         width: 25px;
         height: 25px;
-        background-color: ${({theme, selectedID, contact}) => selectedID === contact.id ? theme.iconHoverBG : theme.iconBG};
+        background-color: ${({theme, selectedID, contact}) => selectedID === contact.id ? theme.iconHoverBG :
+                theme.iconBG};
         border-radius: 3px;
         align-content: center;
     }
 `;
 
-const Contact = ({contact}) => {
-    const { handleContactClick, isContactSelected, setSearchWord }= useContext(GlobalContext);
-    
+const Contact = ({contact, isSelectedContact}) => {
+    const { handleContactClick,
+            isContactSelected,
+            setSearchWord } = useContext(GlobalContext);
+
     return (
         <StyledContact
             onClick={(() => {
@@ -62,6 +67,7 @@ const Contact = ({contact}) => {
             )}
             selectedID={isContactSelected.id}
             contact={contact}
+            isSelectedContact={isSelectedContact}
         >
             <div>
                 <span className='fa-icon'><FontAwesomeIcon className="faUser" icon={contact.icon} /></span>
@@ -72,7 +78,7 @@ const Contact = ({contact}) => {
 }
 
 Contact.propTypes = {
-    contact: PropType.shape({}).isRequired,
+    contact: PropType.shape({}).isRequired
 }
 
 export default Contact;

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, {createContext, useEffect, useRef, useState} from 'react';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle, faShopify, faInstagram, faUber, faAlgolia  } from '@fortawesome/free-brands-svg-icons';
 
@@ -13,6 +13,37 @@ const DropDownContextProvider = (props) => {
     })
     const [contactsList, setContactsList] = useState([])
     const [searchWord, setSearchWord] = useState('')
+    const [tagButtonState, setTagButtonState] = useState({
+        first: null,
+        second: null
+    })
+    const [isSelectedContact, setIsSelectedContact] = useState(false)
+
+    useEffect(() => {
+        // Load from storage
+        if (typeof Storage !== 'undefined') {
+            // localStorage supported.
+            const contactsData = JSON.parse(localStorage.getItem('contactsList'));
+            if (contactsData) {
+                setContactsList(contactsData);
+            }
+        } else {
+            // Using cookies here :(
+            let contactsData = document.cookie;
+            if (contactsData !== '') {
+                contactsData = contactsData.split('; ');
+                const decodedContacts = [];
+                contactsData.forEach((contact) => {
+                    const splitContact = contact.split('=');
+                    decodedContacts.push({
+                        id: splitContact[0],
+                        name: splitContact[1],
+                    });
+                });
+                setContactsList(decodedContacts);
+            }
+        }
+    }, []);
 
     useEffect(() => {
         // save to storage
@@ -23,37 +54,11 @@ const DropDownContextProvider = (props) => {
             // Using cookies here :(
             const contactsData = contactsList;
             contactsData.forEach((contact) => {
-            document.cookie = `${contact.id}=${contact.name}; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+                document.cookie = `${contact.id}=${contact.name}; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
             });
         }
     }, [contactsList]);
 
-    useEffect(() => {
-        // Load from storage
-        if (typeof Storage !== 'undefined') {
-          // localStorage supported.
-          const contactsData = JSON.parse(localStorage.getItem('contactsList'));
-          if (contactsData) {
-            setContactsList(contactsData);
-          }
-        } else {
-          // Using cookies here :(
-          let contactsData = document.cookie;
-          if (contactsData !== '') {
-            contactsData = contactsData.split('; ');
-            const decodedContacts = [];
-            contactsData.forEach((contact) => {
-              const splitContact = contact.split('=');
-              decodedContacts.push({
-                id: splitContact[0],
-                name: splitContact[1],
-              });
-            });
-            setContactsList(decodedContacts);
-          }
-        }
-    }, []);
-    
     const contacts = 
         [
             { 'id': 1, 'name': 'Louie Popp', 'icon': faUser },
@@ -77,19 +82,23 @@ const DropDownContextProvider = (props) => {
 
     const handleButtonClick = () => {
         setIsTagButtonOn(!isTagButtonOn)
+        const buttonState = tagButtonState
+        buttonState.second = buttonState.first
+        buttonState.first = !isTagButtonOn
+        setTagButtonState(buttonState)
     }
+
     const handleContactClick = (id, name) => {
         if (isContactSelected.id === id) {
             setIsContactSelected({...isContactSelected, value: false, id: null})
         } else {
             setIsContactSelected({...isContactSelected, value: true, id})
         }
-        if (!contactsList.some(item => item.id === id)) {
-            const contact = contactsList
-            contact.push({id, name})
-            setContactsList(contact) 
+        if (!contactsList.some(contact => contact.id === id)) {
+            setContactsList([...contactsList, {id, name}])
         }
     }
+
     const deleteContact = (id) => {
         setContactsList(contactsList.filter((contact) => contact.id !== id))
     }
@@ -98,7 +107,10 @@ const DropDownContextProvider = (props) => {
         <GlobalContext.Provider 
             value={{isUsersDisplayed,
                     isTagButtonOn,
+                    tagButtonState,
                     isContactSelected,
+                    isSelectedContact,
+                    setIsSelectedContact,
                     contactsList,
                     searchWord,
                     setSearchWord,

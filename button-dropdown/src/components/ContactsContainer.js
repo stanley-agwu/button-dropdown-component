@@ -12,7 +12,10 @@ export const StyledContact = styled.div`
 `;
 
 const ContactsContainer = () => {
-    const { isUsersDisplayed, contacts, brands, searchWord } = useContext(GlobalContext);
+    const { isUsersDisplayed,
+            contacts,
+            brands,
+            searchWord } = useContext(GlobalContext);
 
     const contactsDisplay = contacts.filter(contact => {
         return searchWord === '' ? contact :
@@ -22,6 +25,7 @@ const ContactsContainer = () => {
         return (
             <Contact contact={contact}
                 key={contact.id}
+                // isSelectedContact={isSelectedContact}
             />
         )
     })
