@@ -25,7 +25,6 @@ const ContactsContainer = () => {
         return (
             <Contact contact={contact}
                 key={contact.id}
-                // isSelectedContact={isSelectedContact}
             />
         )
     })

@@ -1,4 +1,4 @@
-import React, {createContext, useEffect, useRef, useState} from 'react';
+import React, {createContext, useEffect, useState} from 'react';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle, faShopify, faInstagram, faUber, faAlgolia  } from '@fortawesome/free-brands-svg-icons';
 
